@@ -1,7 +1,27 @@
+ /************************************************************************
+  * 
+  * pwgen - The password generator
+  * Copyright (C) 2001  Marcus Jansson <mjansson256@yahoo.se>
+  *
+  * This program is free software: you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+  * the Free Software Foundation, either version 3 of the License, or
+  * (at your option) any later version.
+  *
+  * This program is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU General Public License for more details.
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  * 
+  ************************************************************************/
+
 #include <stdio.h>
 #include <unistd.h>
 
-#define VERSION "0.5"
+#define VERSION "0.6"
 
 #define YES 1
 #define NO 0
@@ -14,12 +34,15 @@
 
 void help(void)
 {
-	printf("Usage: pwgen [-n, nr_of_random_chars (default 8 - 16)] [-i, include all chars (default)] [-e,  exclude uncommon chars]\n");
+	printf("Usage: pwgen [-n, nr of chars (default 8 - 16)] [-i, include all chars (default)] [-e,  exclude strange chars] [-o filename, output to a file]\n");
 }
 
 void version(void)
 {
 	printf("pwgen %s (C) Copyright 2011 Marcus Jansson <mjansson256@gmail.com>\n", VERSION);
+	printf("This program comes with ABSOLUTELY NO WARRANTY.\n
+    This is free software, and you are welcome to redistribute it\n
+    under certain conditions.\n");
 };
 
 unsigned char slump(char min, char max)
@@ -29,14 +52,15 @@ unsigned char slump(char min, char max)
 
 int main(int argc, char * argv[])
 {
-	char i;
+	unsigned int i;
 	unsigned char ch;
-	int nr_of_chars;
+	unsigned int nr_of_chars;
 	char include_uncommon_chars;
 	int c;
 	FILE * fp;
 	char filename[1024];	//Oh, bad programming. :/
 	
+	//Default output to stdout
 	fp = stdout;
 	
 	opterr = 0;
@@ -46,7 +70,7 @@ int main(int argc, char * argv[])
 	nr_of_chars = slump(NR_OF_CHARS_MIN, NR_OF_CHARS_MAX);
 	include_uncommon_chars = YES;	
 	
-	while((c = getopt(argc, argv, "ein:o:h")) != -1) {
+	while((c = getopt(argc, argv, "ein:o:hv")) != -1) {
 		switch(c) {
 			case 'e':
 				printf("Excluding strange chars\n");
@@ -77,6 +101,12 @@ int main(int argc, char * argv[])
 				help();
 				return;
 				break;
+				
+			case 'v':
+				version();
+				break;
+				
+			/* Some argument is missing, try to understand what */
 			case '?':
 			
 				/* Forgot to give number of chars in the argument list */
@@ -95,37 +125,14 @@ int main(int argc, char * argv[])
 		}
 	}
 	
-	//~ /* Help requested? */
-	//~ if((argv > 1) && strncmp(argc[1], "--help", 6) == 0) {
-		//~ version();
-		//~ help();
-		//~ return;
-	//~ } 
-//~ 
-	//~ /* First parameter is the nr of chars to generate
-	 //~ * Otherwise default to a random nr of chars */
-	//~ if(argv > 1) {
-		//~ nr_of_chars = atoi(argc[1]);
-	//~ } else {
-		//~ nr_of_chars = slump(NR_OF_CHARS_MIN, NR_OF_CHARS_MAX);
-	//~ }
-//~ 
-	//~ include_uncommon_chars = YES;	
-	//~ if(argv >= 3) {
-		//~ if(strncmp(argc[2], "exclude", 7) == 0) {
-			//~ printf("Excluding strange chars\n");
-			//~ include_uncommon_chars = NO;
-		//~ } 
-	//~ }
-	 
 	for(i = 0; i < nr_of_chars; i++) {
 		switch(include_uncommon_chars) {
 			case YES:
-				ch = slump(CHAR_MIN, CHAR_MAX);	//Get a char btwn 0x21 and 0x7e
+				ch = slump(CHAR_MIN, CHAR_MAX);				//Get a char (normally btwn 0x21 and 0x7e)
 				break;
 			case NO:
 				do {
-					ch = slump(CHAR_MIN, CHAR_MAX); //Get a char btwn 0x21 and 0x7e
+					ch = slump(CHAR_MIN, CHAR_MAX); 		//Get a char (normally btwn 0x21 and 0x7e)
 				} while(!(((ch >= 0x30) && (ch <= 0x39)) 
 						|| ((ch >= 0x41) && (ch <= 0x5a)) 
 						|| ((ch >= 0x61) && (ch <= 0x7a)))
