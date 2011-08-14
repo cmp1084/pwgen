@@ -40,8 +40,8 @@ void help(void)
 void version(void)
 {
 	printf("pwgen %s (C) Copyright 2011 Marcus Jansson <mjansson256@gmail.com>\n", VERSION);
-	printf("This program comes with ABSOLUTELY NO WARRANTY.\n
-    This is free software, and you are welcome to redistribute it\n
+	printf("This program comes with ABSOLUTELY NO WARRANTY.\n \
+    This is free software, and you are welcome to redistribute it\n \
     under certain conditions.\n");
 };
 
@@ -83,13 +83,8 @@ int main(int argc, char * argv[])
 				break;
 			
 			case 'n':
-				if(optarg != NULL) {
-					nr_of_chars = atoi(optarg);
-					printf("Generating %i chars\n", nr_of_chars);
-				} else {
-					printf("optarg == NULL!\n");
-					return;
-				}
+				nr_of_chars = atoi(optarg);
+				printf("Generating %i chars\n", nr_of_chars);
 				break;
 			
 			case 'o':
@@ -99,11 +94,12 @@ int main(int argc, char * argv[])
 			
 			case 'h':
 				help();
-				return;
+				return -1;	//Not an error, but we probably want to signal something to the system
 				break;
 				
 			case 'v':
 				version();
+				return -1;	//Not an error, but we probably want to signal something to the system
 				break;
 				
 			/* Some argument is missing, try to understand what */
@@ -125,6 +121,7 @@ int main(int argc, char * argv[])
 		}
 	}
 	
+	/* Generate a random pw */
 	for(i = 0; i < nr_of_chars; i++) {
 		switch(include_uncommon_chars) {
 			case YES:
@@ -133,13 +130,12 @@ int main(int argc, char * argv[])
 			case NO:
 				do {
 					ch = slump(CHAR_MIN, CHAR_MAX); 		//Get a char (normally btwn 0x21 and 0x7e)
-				} while(!(((ch >= 0x30) && (ch <= 0x39)) 
-						|| ((ch >= 0x41) && (ch <= 0x5a)) 
-						|| ((ch >= 0x61) && (ch <= 0x7a)))
+				} while(!(((ch >= 0x30) && (ch <= 0x39)) 	//Allow numbers
+						|| ((ch >= 0x41) && (ch <= 0x5a)) 	//Allow big letters
+						|| ((ch >= 0x61) && (ch <= 0x7a)))	//Allow small
 					);
 				break;
 		}
-		
 		fprintf(fp, "%c", ch);
 	}
 	
