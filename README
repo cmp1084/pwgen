@@ -5,7 +5,11 @@
  pwgen is a random letter generator that output random letters to the 
  screen or to a file.
  
- How does it work
+ Who?
+ ----
+ pwgen was written by Marcus Jansson <mjansson256@yahoo.se>
+ 
+ How does it work?
  -----------------
  Usage: pwgen [options]
 Options:
@@ -33,3 +37,5 @@ Options:
  No, there are other programs available that probably is much better and
  secure. However, this might be a base to get something as good for 
  yourself.
+
+Ok, have fun, take care.
