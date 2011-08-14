@@ -1,6 +1,6 @@
  /************************************************************************
   * 
-  * pwgen - The password generator
+  * pwgen - The random letter generator
   * Copyright (C) 2001  Marcus Jansson <mjansson256@yahoo.se>
   *
   * This program is free software: you can redistribute it and/or modify
