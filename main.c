@@ -27,42 +27,97 @@ unsigned char slump(char min, char max)
 	return (rand() % (max - min + 1)) + min; 
 }
 
-int main(int argv, char * argc[])
+int main(int argc, char * argv[])
 {
 	char i;
 	unsigned char ch;
-	char nr_of_chars;
+	int nr_of_chars;
 	char include_uncommon_chars;
+	int c;
+	FILE * fp;
+	char filename[1024];	//Oh, bad programming. :/
+	
+	fp = stdout;
+	
+	opterr = 0;
 	
 	srand(time(NULL));
 
-	//~ for(i = 0; i < argv; i++) {
-		//~ printf("argc[%i]: %s\n", i, argc[i]);
-	//~ }
-
-	/* Help requested? */
-	if((argv > 1) && strncmp(argc[1], "--help", 6) == 0) {
-		version();
-		help();
-		return;
-	} 
-
-	/* First parameter is the nr of chars to generate
-	 * Otherwise default to a random nr of chars */
-	if(argv > 1) {
-		nr_of_chars = atoi(argc[1]);
-	} else {
-		nr_of_chars = slump(NR_OF_CHARS_MIN, NR_OF_CHARS_MAX);
-	}
-
+	nr_of_chars = slump(NR_OF_CHARS_MIN, NR_OF_CHARS_MAX);
 	include_uncommon_chars = YES;	
-	if(argv >= 3) {
-		if(strncmp(argc[2], "exclude", 7) == 0) {
-			printf("Excluding strange chars\n");
-			include_uncommon_chars = NO;
-		} 
+	
+	while((c = getopt(argc, argv, "ein:o:h")) != -1) {
+		switch(c) {
+			case 'e':
+				printf("Excluding strange chars\n");
+				include_uncommon_chars = NO;	
+				break;
+			
+			case 'i':
+				printf("Including strange chars\n");
+				include_uncommon_chars = YES;	
+				break;
+			
+			case 'n':
+				if(optarg != NULL) {
+					nr_of_chars = atoi(optarg);
+					printf("Generating %i chars\n", nr_of_chars);
+				} else {
+					printf("optarg == NULL!\n");
+					return;
+				}
+				break;
+			
+			case 'o':
+				printf("Writing to file %s\n", optarg);
+				fp = fopen(optarg, "w");
+				break;
+			
+			case 'h':
+				help();
+				return;
+				break;
+			case '?':
+			
+				/* Forgot to give number of chars in the argument list */
+				if(optopt == 'n') {
+					printf("Give a number for how many chars should be generated\nn: ");
+					scanf("%i", &nr_of_chars);
+				}
+				
+				/* Forgot to give filename in the argument list */
+				if(optopt == 'o') {
+					printf("Give a filename: ");
+					scanf("%[^\n]", filename);
+					fp = fopen(filename, "w");
+				}
+				break;
+		}
 	}
 	
+	//~ /* Help requested? */
+	//~ if((argv > 1) && strncmp(argc[1], "--help", 6) == 0) {
+		//~ version();
+		//~ help();
+		//~ return;
+	//~ } 
+//~ 
+	//~ /* First parameter is the nr of chars to generate
+	 //~ * Otherwise default to a random nr of chars */
+	//~ if(argv > 1) {
+		//~ nr_of_chars = atoi(argc[1]);
+	//~ } else {
+		//~ nr_of_chars = slump(NR_OF_CHARS_MIN, NR_OF_CHARS_MAX);
+	//~ }
+//~ 
+	//~ include_uncommon_chars = YES;	
+	//~ if(argv >= 3) {
+		//~ if(strncmp(argc[2], "exclude", 7) == 0) {
+			//~ printf("Excluding strange chars\n");
+			//~ include_uncommon_chars = NO;
+		//~ } 
+	//~ }
+	 
 	for(i = 0; i < nr_of_chars; i++) {
 		switch(include_uncommon_chars) {
 			case YES:
@@ -78,10 +133,15 @@ int main(int argv, char * argc[])
 				break;
 		}
 		
-		printf("%c", ch);
+		fprintf(fp, "%c", ch);
 	}
 	
-	printf("\n");
+	/* Close the file, or print a newline if we wrote to stdout (screen) */
+	if(fp != stdout) {
+		fclose(fp);
+	} else {
+		printf("\n");
+	}
 	
 	return 0;
 }
