@@ -69,7 +69,7 @@ int main(int argc, char * argv[])
 	unsigned int i;
 	int c;
 	unsigned char ch;
-	unsigned int nr_of_chars;
+	unsigned int nr_of_chars = 0;
 	unsigned int repeat = 1;
 	char repeat_random_len;
 	char include_uncommon_chars;
