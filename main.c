@@ -1,6 +1,6 @@
  /************************************************************************
   * 
-  * pwgen - The random letter generator
+  * pwgen - The random string generator
   * Copyright (C) 2001  Marcus Jansson <mjansson256@yahoo.se>
   *
   * This program is free software: you can redistribute it and/or modify
@@ -32,9 +32,19 @@
 #define CHAR_MIN 0x21
 #define CHAR_MAX 0x7e
 
+
 void help(void)
 {
-	printf("Usage: pwgen [-n, nr of chars (default 8 - 16)] [-i, include all chars (default)] [-e,  exclude strange chars] [-o filename, output to a file]\n");
+	printf("Usage: pwgen [options]\n \
+Options:\n \
+ -v         Verbose, must be first option.\n \
+ -l <len> 	Length of random string to generate (default is random 8-16)\n \
+ -n <nr>    Repeat random string generation <nr> of times\n \
+ -e 		Exclude strange letters\n \
+ -i			Include strange letters (default)\n \
+ -o <file>	Output random strings to file\n \
+ -a <file>  Append random strings to file\n \
+ ");
 }
 
 void version(void)
@@ -55,10 +65,13 @@ int main(int argc, char * argv[])
 	unsigned int i;
 	unsigned char ch;
 	unsigned int nr_of_chars;
+	unsigned int repeat = 1;
+	char repeat_random_len;
 	char include_uncommon_chars;
 	int c;
 	FILE * fp;
-	char filename[1024];	//Oh, bad programming. :/
+	char filename[512];	//Oh, bad programming. :/
+	char verbose = NO;
 	
 	//Default output to stdout
 	fp = stdout;
@@ -68,36 +81,62 @@ int main(int argc, char * argv[])
 	srand(time(NULL));
 
 	nr_of_chars = slump(NR_OF_CHARS_MIN, NR_OF_CHARS_MAX);
+	repeat_random_len = YES;
 	include_uncommon_chars = YES;	
-	
-	while((c = getopt(argc, argv, "ein:o:hv")) != -1) {
+		
+	while((c = getopt(argc, argv, "ein:r:o:a:hvV")) != -1) {
 		switch(c) {
+			/* Exclude strange chars */
 			case 'e':
-				printf("Excluding strange chars\n");
 				include_uncommon_chars = NO;	
 				break;
 			
+			/* Include strange chars */
 			case 'i':
-				printf("Including strange chars\n");
 				include_uncommon_chars = YES;	
 				break;
 			
-			case 'n':
+			/* Number of chars */
+			case 'l':
 				nr_of_chars = atoi(optarg);
-				printf("Generating %i chars\n", nr_of_chars);
+				repeat_random_len = NO;
 				break;
 			
+			/* Repeat */
+			case 'n':
+				repeat = atoi(optarg);
+				break;
+			
+			/* Output to file */
 			case 'o':
-				printf("Writing to file %s\n", optarg);
+				if(verbose == YES) {
+					printf("Writing to file %s\n", optarg);
+				}
 				fp = fopen(optarg, "w");
 				break;
 			
+			/* Append to file */
+			case 'a':
+				if(verbose == YES) {
+					printf("Appending to file %s\n", optarg);
+				}
+				fp = fopen(optarg, "a");
+				fprintf(fp, "\n");
+				break;
+			
+			/* Help */
 			case 'h':
 				help();
 				return -1;	//Not an error, but we probably want to signal something to the system
 				break;
 				
+			/* Verbose */
 			case 'v':
+				verbose = YES;
+				break;
+				
+			/* Version */
+			case 'V':
 				version();
 				return -1;	//Not an error, but we probably want to signal something to the system
 				break;
@@ -106,45 +145,80 @@ int main(int argc, char * argv[])
 			case '?':
 			
 				/* Forgot to give number of chars in the argument list */
-				if(optopt == 'n') {
-					printf("Give a number for how many chars should be generated\nn: ");
+				if(optopt == 'l') {
+					printf("Length of string: ");
 					scanf("%i", &nr_of_chars);
 				}
 				
-				/* Forgot to give filename in the argument list */
+				/* Forgot to give number of repeats in the argument list */
+				if(optopt == 'n') {
+					printf("Repeat nr: ");
+					scanf("%i", &repeat);
+				}
+				
+				/* Forgot to give new filename in the argument list */
 				if(optopt == 'o') {
-					printf("Give a filename: ");
-					scanf("%[^\n]", filename);
+					printf("Create file: ");
+					scanf("%511[^\n]", filename);	//TODO: len
 					fp = fopen(filename, "w");
+				}
+				
+				/* Forgot to give append filename in the argument list */
+				if(optopt == 'a') {
+					printf("Append to file: ");
+					scanf("%511[^\n]", filename);	//TODO: len
+					fp = fopen(filename, "a");
 				}
 				break;
 		}
 	}
 	
-	/* Generate a random pw */
-	for(i = 0; i < nr_of_chars; i++) {
+	if(verbose == YES) {
+		printf("Generating %i chars.\n", nr_of_chars);
+		printf("Generating %i random string", repeat);
+		if(repeat > 1) { 
+			printf("s");
+		}
+		printf(".\n");
 		switch(include_uncommon_chars) {
 			case YES:
-				ch = slump(CHAR_MIN, CHAR_MAX);				//Get a char (normally btwn 0x21 and 0x7e)
+				printf("Including strange chars\n");
 				break;
 			case NO:
-				do {
-					ch = slump(CHAR_MIN, CHAR_MAX); 		//Get a char (normally btwn 0x21 and 0x7e)
-				} while(!(((ch >= 0x30) && (ch <= 0x39)) 	//Allow numbers
-						|| ((ch >= 0x41) && (ch <= 0x5a)) 	//Allow big letters
-						|| ((ch >= 0x61) && (ch <= 0x7a)))	//Allow small
-					);
+				printf("Excluding strange chars\n");
 				break;
-		}
-		fprintf(fp, "%c", ch);
+			}
 	}
+	
+	/* Generate 'repeat' nr of strings */
+	while(repeat-- != 0) {
+		/* Generate a random string */
+		for(i = 0; i < nr_of_chars; i++) {
+			switch(include_uncommon_chars) {
+				case YES:
+					ch = slump(CHAR_MIN, CHAR_MAX);				//Get a char (normally btwn 0x21 and 0x7e)
+					break;
+				case NO:
+					do {
+						ch = slump(CHAR_MIN, CHAR_MAX); 		//Get a char (normally btwn 0x21 and 0x7e)
+					} while(!(((ch >= 0x30) && (ch <= 0x39)) 	//Allow numbers
+							|| ((ch >= 0x41) && (ch <= 0x5a)) 	//Allow big letters
+							|| ((ch >= 0x61) && (ch <= 0x7a)))	//Allow small letters
+						);
+					break;
+			}
+			fprintf(fp, "%c", ch);
+		}
+		fprintf(fp, "\n");
+		if(repeat_random_len == YES) {
+			nr_of_chars = slump(NR_OF_CHARS_MIN, NR_OF_CHARS_MAX);
+		}
+	} 
 	
 	/* Close the file, or print a newline if we wrote to stdout (screen) */
 	if(fp != stdout) {
 		fclose(fp);
-	} else {
-		printf("\n");
-	}
+	} 
 	
 	return 0;
 }

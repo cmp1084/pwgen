@@ -1,41 +1,55 @@
- pwgen - The random letter generator
+ pwgen - The random string generator
+ ===================================
  
- Introduction
- -------------
- pwgen is a random letter generator that output random letters to the 
+ Content
+ 1. Introduction
+ 2. Who?
+ 3. How does it work?
+ 4. Why?
+ 5. Other options?
+ 
+ 
+ 
+ 1. Introduction
+ ---------------
+ pwgen is a random string generator that output random strings to the 
  screen or to a file.
  
- Who?
- ----
+ 2. Who?
+ -------
  pwgen was written by Marcus Jansson <mjansson256@yahoo.se>
  
- How does it work?
- -----------------
+ 3. How does it work?
+ --------------------
  Usage: pwgen [options]
 Options:
- -n <nr> 	Nr of random letters to generate (default is 8-16)
+ -v         Verbose
+ -l <len> 	Lenght of random strings to generate (default is random 8-16)
+ -n <nr>    Nr of strings to generate
  -e 		Exclude strange letters
  -i			Include strange letters (default)
- -o <file>	Output random letters to file
+ -o <file>	Output random strings to file <file>
+ -a <file>  Append random strings to file <file>
  
  Example:
  # pwgen -n12
  y3C'qC828(rD
  
  Example:
- # pwgen -e -o pwfile
+ # pwgen -e -r2 -o pwfile
  # cat pwfile
  53rJHgZ8FbKSmx
+ hIdh4N27n
  
- Why?
- ----
+ 4. Why?
+ -------
  pwgen was written because I needed to quickly generate a few random 
- letters.
+ strings.
  
- Should I bother?
- ----------------
- No, there are other programs available that probably is much better and
- secure. However, this might be a base to get something as good for 
+ 5. Other options?
+ -----------------
+ No, there are other programs available that probably are much better 
+ and secure. However, this might be a base to make something as good for 
  yourself.
 
 Ok, have fun, take care.
