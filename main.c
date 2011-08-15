@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#define VERSION "0.6"
+#define VERSION "0.7"
 
 #define YES 1
 #define NO 0
@@ -32,17 +32,19 @@
 #define CHAR_MIN 0x21
 #define CHAR_MAX 0x7e
 
+static FILE * fp_rand;
 
 void help(void)
 {
 	printf("Usage: pwgen [options]\n \
 Options:\n \
- -v         Verbose, must be first option.\n \
- -l <len> 	Length of random string to generate (default is random 8-16)\n \
+ -v         Verbose, must be first option\n \
+ -l <len>   Length of random string to generate (default is random 8-16)\n \
  -n <nr>    Repeat random string generation <nr> of times\n \
- -e 		Exclude strange letters\n \
- -i			Include strange letters (default)\n \
- -o <file>	Output random strings to file\n \
+ -e         Exclude strange letters\n \
+ -i         Include strange letters (default)\n \
+ -s         Secure\n \
+ -o <file>  Output random strings to file\n \
  -a <file>  Append random strings to file\n \
  ");
 }
@@ -57,7 +59,10 @@ void version(void)
 
 unsigned char slump(char min, char max)
 {
-	return (rand() % (max - min + 1)) + min; 
+	unsigned char rand_nr;
+	fread(&rand_nr, sizeof(unsigned char), 1, fp_rand);
+	return (rand_nr % (max - min + 1)) + min; 
+	//~ return (rand() % (max - min + 1)) + min; 
 }
 
 int main(int argc, char * argv[])
@@ -69,7 +74,9 @@ int main(int argc, char * argv[])
 	char repeat_random_len;
 	char include_uncommon_chars;
 	int c;
+	char secure;
 	FILE * fp;
+	
 	char filename[512];	//Oh, bad programming. :/
 	char verbose = NO;
 	
@@ -77,14 +84,12 @@ int main(int argc, char * argv[])
 	fp = stdout;
 	
 	opterr = 0;
-	
-	srand(time(NULL));
-
-	nr_of_chars = slump(NR_OF_CHARS_MIN, NR_OF_CHARS_MAX);
+		
+	secure = NO;
 	repeat_random_len = YES;
 	include_uncommon_chars = YES;	
 		
-	while((c = getopt(argc, argv, "ein:r:o:a:hvV")) != -1) {
+	while((c = getopt(argc, argv, "eil:n:o:a:hsvV")) != -1) {
 		switch(c) {
 			/* Exclude strange chars */
 			case 'e':
@@ -122,6 +127,11 @@ int main(int argc, char * argv[])
 				}
 				fp = fopen(optarg, "a");
 				fprintf(fp, "\n");
+				break;
+			
+			/* Secure */
+			case 's':
+				secure = YES;
 				break;
 			
 			/* Help */
@@ -173,6 +183,16 @@ int main(int argc, char * argv[])
 		}
 	}
 	
+	if(secure == YES) {
+		fp_rand = fopen("/dev/random", "r");
+	} else {
+		fp_rand = fopen("/dev/urandom", "r");
+	}
+	
+	if(nr_of_chars == 0) {
+		nr_of_chars = slump(NR_OF_CHARS_MIN, NR_OF_CHARS_MAX);
+	}
+	
 	if(verbose == YES) {
 		printf("Generating %i chars.\n", nr_of_chars);
 		printf("Generating %i random string", repeat);
@@ -219,6 +239,7 @@ int main(int argc, char * argv[])
 	if(fp != stdout) {
 		fclose(fp);
 	} 
+	fclose(fp_rand);
 	
 	return 0;
 }

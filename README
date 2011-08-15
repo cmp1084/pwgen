@@ -1,5 +1,22 @@
- pwgen - The random string generator
- ===================================
+ /************************************************************************
+  * 
+  * pwgen - The random string generator
+  * Copyright (C) 2001  Marcus Jansson <mjansson256@yahoo.se>
+  *
+  * This program is free software: you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+  * the Free Software Foundation, either version 3 of the License, or
+  * (at your option) any later version.
+  *
+  * This program is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU General Public License for more details.
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  * 
+  ************************************************************************/
  
  Content
  1. Introduction
@@ -13,7 +30,7 @@
  1. Introduction
  ---------------
  pwgen is a random string generator that output random strings to the 
- screen or to a file.
+ screen or to a file. The strings are considered random and secure.
  
  2. Who?
  -------
@@ -28,11 +45,12 @@ Options:
  -n <nr>    Nr of strings to generate
  -e 		Exclude strange letters
  -i			Include strange letters (default)
+ -s			Secure
  -o <file>	Output random strings to file <file>
  -a <file>  Append random strings to file <file>
  
  Example:
- # pwgen -n12
+ # pwgen -n12 -s
  y3C'qC828(rD
  
  Example:
