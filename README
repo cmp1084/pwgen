@@ -1,5 +1,5 @@
  /************************************************************************
-  * 
+  *
   * pwgen - The random string generator
   * Copyright (C) 2001  Marcus Jansson <mjansson256@yahoo.se>
   *
@@ -15,28 +15,46 @@
   *
   * You should have received a copy of the GNU General Public License
   * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  * 
+  *
   ************************************************************************/
- 
- Content
- 1. Introduction
- 2. Who?
- 3. How does it work?
- 4. Why?
- 5. Other options?
- 
- 
- 
+
+ Contents
+ --------
+1. Introduction
+2. Who did pwgen?
+3. How to install?
+4. How does it work?
+5. Why?
+6. Other options?
+
+
+
  1. Introduction
  ---------------
- pwgen is a random string generator that output random strings to the 
+ pwgen is a random string generator that output random strings to the
  screen or to a file. The strings are considered random and secure.
- 
+
+
  2. Who?
  -------
  pwgen was written by Marcus Jansson <mjansson256@yahoo.se>
- 
- 3. How does it work?
+
+
+ 3. How to install?
+ ------------------
+ Compilation of the source is done by typing:
+ # make
+
+ Installation is done by typing:
+ # make install
+
+ or to install into a specific directory:
+ # make install INSTALLDIR=/path/to/installdir
+
+ Possibly as superuser if you dont have write permission to the INSTALLDIR.
+
+
+ 4. How does it work?
  --------------------
  Usage: pwgen [options]
 Options:
@@ -48,26 +66,28 @@ Options:
  -s			Secure
  -o <file>	Output random strings to file <file>
  -a <file>  Append random strings to file <file>
- 
+
  Example:
  # pwgen -n12 -s
  y3C'qC828(rD
- 
+
  Example:
  # pwgen -e -r2 -o pwfile
  # cat pwfile
  53rJHgZ8FbKSmx
  hIdh4N27n
- 
- 4. Why?
+
+
+ 5. Why?
  -------
- pwgen was written because I needed to quickly generate a few random 
+ pwgen was written because I needed to quickly generate a few random
  strings.
- 
- 5. Other options?
+
+
+ 6. Other options?
  -----------------
- No, there are other programs available that probably are much better 
- and secure. However, this might be a base to make something as good for 
+ Yes, there are other programs available that probably are much better
+ and secure. However, this might be a base to make something as good for
  yourself.
 
 Ok, have fun, take care.
