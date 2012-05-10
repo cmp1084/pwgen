@@ -45,8 +45,7 @@ Options:\n \
  -i         Include strange letters (default)\n \
  -s         Secure\n \
  -o <file>  Output random strings to file\n \
- -a <file>  Append random strings to file\n \
- ");
+ -a <file>  Append random strings to file\n");
 }
 
 void version(void)
@@ -67,7 +66,6 @@ unsigned char slump(char min, char max)
 int main(int argc, char * argv[])
 {
 	unsigned int i;
-	int c;
 	unsigned char ch;
 	unsigned int nr_of_chars = 0;
 	unsigned int repeat = 1;
@@ -78,7 +76,6 @@ int main(int argc, char * argv[])
 	char filename[1024];
 	FILE * fp;
 
-
 	//Default options etc
 	fp = stdout;	//output to stdout
 	opterr = 0;
@@ -87,8 +84,8 @@ int main(int argc, char * argv[])
 	include_uncommon_chars = YES;
 	verbose = NO;
 
-	while((c = getopt(argc, argv, "eil:n:o:a:hsvV")) != -1) {
-		switch(c) {
+	while((i = getopt(argc, argv, "eil:n:o:a:hsvV")) != -1) {
+		switch(i) {
 			/* Exclude strange chars */
 			case 'e':
 				include_uncommon_chars = NO;
@@ -132,24 +129,25 @@ int main(int argc, char * argv[])
 				secure = YES;
 				break;
 
-			/* Help */
-			case 'h':
-				help();
-				return -1;	//Not an error, but we probably want to signal something to the system
-				break;
-
 			/* Verbose */
 			case 'v':
 				verbose = YES;
 				break;
 
+			/* Help */
+			case 'h':
+				version();
+				help();
+				return -1;	//Not an error, but we probably want to signal something ("Password not generated"... ) to the system
+				break;
+
 			/* Version */
 			case 'V':
 				version();
-				return -1;	//Not an error, but we probably want to signal something to the system
+				return -2;	//Not an error, but we probably want to signal something ("Password not generated"... ) to the system
 				break;
 
-			/* Some argument is missing, try to understand what */
+			/* Some argument value is missing, try to understand what */
 			case '?':
 
 				/* Forgot to give number of chars in the argument list */
@@ -160,7 +158,7 @@ int main(int argc, char * argv[])
 
 				/* Forgot to give number of repeats in the argument list */
 				if(optopt == 'n') {
-					printf("Repeat nr: ");
+					printf("Nr of strings: ");
 					scanf("%i", &repeat);
 				}
 
@@ -197,16 +195,16 @@ int main(int argc, char * argv[])
 	if(verbose == YES) {
 		printf("Generating %i chars.\n", nr_of_chars);
 		printf("Generating %i random string", repeat);
-		if(repeat > 1) {
+		if(repeat > 1) {	//Handle pluralis
 			printf("s");
 		}
 		printf(".\n");
 		switch(include_uncommon_chars) {
 			case YES:
-				printf("Including strange chars\n");
+				printf("Including strange chars.\n");
 				break;
 			case NO:
-				printf("Excluding strange chars\n");
+				printf("Excluding strange chars.\n");
 				break;
 			}
 	}
@@ -222,6 +220,7 @@ int main(int argc, char * argv[])
 				case NO:
 					do {
 						ch = slump(CHAR_MIN, CHAR_MAX); 		//Get a char (normally btwn 0x21 and 0x7e)
+						//if(
 					} while(!(((ch >= 0x30) && (ch <= 0x39)) 	//Allow numbers
 							|| ((ch >= 0x41) && (ch <= 0x5a)) 	//Allow big letters
 							|| ((ch >= 0x61) && (ch <= 0x7a)))	//Allow small letters
@@ -231,6 +230,8 @@ int main(int argc, char * argv[])
 			fprintf(fp, "%c", ch);
 		}
 		fprintf(fp, "\n");
+
+		/* Do we want a new random length for each string we generate? */
 		if(repeat_random_len == YES) {
 			nr_of_chars = slump(NR_OF_CHARS_MIN, NR_OF_CHARS_MAX);
 		}

@@ -72,7 +72,7 @@ Options:
  y3C'qC828(rD
 
  Example:
- # pwgen -e -r2 -o pwfile
+ # pwgen -e -n2 -o pwfile
  # cat pwfile
  53rJHgZ8FbKSmx
  hIdh4N27n
